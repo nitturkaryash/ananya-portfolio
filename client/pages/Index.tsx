@@ -58,7 +58,7 @@ export default function Index() {
       <ContainerScroll className="h-[350vh]">
         <BentoGrid className="sticky left-0 top-0 z-0 h-screen w-full p-6 md:p-8">
           {/* Phrase Card */}
-          <BentoCell className="relative bg-[#161616] rounded-3xl p-8 lg:p-16 flex flex-col justify-center overflow-hidden">
+          <BentoCell index={0} className="relative bg-[#161616] rounded-3xl p-8 lg:p-16 flex flex-col justify-center overflow-hidden">
             <div className="absolute top-6 right-6">
               <svg width="59" height="55" viewBox="0 0 59 55" fill="none" className="w-12 h-12">
                 <g clipPath="url(#clip0_1228_3273)">
@@ -78,7 +78,7 @@ export default function Index() {
           </BentoCell>
 
           {/* Case Studies Card */}
-          <BentoCell className="relative rounded-3xl overflow-hidden group cursor-pointer">
+          <BentoCell index={1} className="relative rounded-3xl overflow-hidden group cursor-pointer">
             <img 
               src="https://api.builder.io/api/v1/image/assets/TEMP/99d2361e61ebd13201bcfd5b1d47e25802d55845?width=1321"
               alt="Case Studies"
@@ -97,7 +97,7 @@ export default function Index() {
           </BentoCell>
 
           {/* About Card */}
-          <BentoCell className="relative rounded-3xl overflow-hidden group cursor-pointer">
+          <BentoCell index={2} className="relative rounded-3xl overflow-hidden group cursor-pointer">
             <img 
               src="https://api.builder.io/api/v1/image/assets/TEMP/cb3c225e6062eedbd97f60b6c69a6a8bf60f7966?width=800"
               alt="About"
@@ -113,7 +113,7 @@ export default function Index() {
           </BentoCell>
 
           {/* Resume and Let's Talk Column */}
-          <BentoCell className="flex flex-col gap-6 p-6">
+          <BentoCell index={3} className="flex flex-col gap-6 p-6">
             {/* Resume Card */}
             <div className="border-2 border-[#5A5757] rounded-3xl p-8 h-48 flex items-center justify-center gap-6 cursor-pointer hover:border-[#B7EA01] transition-colors">
               <h2 className="text-white text-3xl lg:text-4xl font-medium">Resume</h2>
@@ -146,7 +146,7 @@ export default function Index() {
           </BentoCell>
 
           {/* Archives Card */}
-          <BentoCell className="relative rounded-3xl overflow-hidden group cursor-pointer">
+          <BentoCell index={4} className="relative rounded-3xl overflow-hidden group cursor-pointer">
             <img 
               src="https://api.builder.io/api/v1/image/assets/TEMP/0d4e5d5f7218b67674e03329cf729ca2418e0f2a?width=1176"
               alt="Archives"
