@@ -1,8 +1,6 @@
-import { useState } from "react";
-import { ContainerScroll, BentoCell, ContainerScale, BentoGrid } from "@/components/blocks/hero-gallery-scroll-animation";
+import { ContainerScroll, BentoCell, ContainerScale, BentoGrid } from "@/components/blocks/scroll-animation";
 
 export default function Index() {
-  const [currentTestimonial, setCurrentTestimonial] = useState(0);
 
   return (
     <div className="min-h-screen bg-black text-white overflow-x-hidden">
@@ -168,71 +166,99 @@ export default function Index() {
         </BentoGrid>
 
         <ContainerScale className="relative z-10 flex items-center justify-center px-4">
-          {/* Card with Pixel Perfect Figma Matching */}
-          <div 
-            className="relative overflow-hidden rounded-3xl"
+          {/* Figma-Accurate Card Design */}
+          <div
+            className="relative overflow-hidden"
             style={{
-              width: '759.4px',
-              height: '593.7px',
+              width: '759.4033203125px',
+              height: '593.6983032226562px',
               maxWidth: '90vw',
-              maxHeight: '80vh'
+              maxHeight: '80vh',
+              borderRadius: '66px',
             }}
           >
-            {/* Background Image - Exact Figma Match */}
-            <div className="absolute inset-0">
-              <img 
-                src="/images/morphism-background-new.png"
-                alt="Background"
-                className="w-full h-full object-cover"
+            {/* Morphism Background - Exact Figma Data */}
+            <div
+              className="absolute"
+              style={{
+                width: '593.135009765625px',
+                height: '759.4033203125px',
+                left: '9.43574333190918px',
+                top: '603.1339721679688px',
+                transform: 'matrix(0.0019049129914492369, -0.9999982118606567, 0.9999982118606567, 0.0019049129914492369, 0, 0)',
+                borderRadius: '66px',
+                backgroundImage: 'url("/images/morphism-exact.png")',
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                filter: 'exposure(-0.6) contrast(-0.233) saturation(-0.77) temperature(1) tint(-0.46) highlights(-0.38) shadows(-1)',
+                transformOrigin: 'center center',
+                opacity: 1,
+                mixBlendMode: 'normal',
+                backgroundRepeat: 'no-repeat'
+              }}
+            />
+
+
+            {/* Content Container - Exact Figma positioning */}
+            <div
+              className="relative z-10 flex flex-col"
+              style={{
+                position: 'absolute',
+                left: '56.46630859375px',
+                top: '143.353515625px',
+                width: '646px',
+                height: 'auto',
+              }}
+            >
+
+              {/* Header Text - Exact Figma positioning */}
+              <h2
+                className="text-white font-normal mb-8"
                 style={{
-                  transform: 'rotate(90.11deg)',
-                  transformOrigin: 'center center',
-                  filter: 'brightness(0.4) contrast(0.77) saturate(0.23) hue-rotate(-166deg) sepia(0.46)'
-                }}
-              />
-            </div>
-            
-            {/* Content Overlay - Figma-accurate absolute positioning */}
-            <div className="relative z-10 w-full h-full">
-              {/* Header Text */}
-              <div
-                className="absolute text-white italic text-center"
-                style={{
-                  left: '56.47px',
-                  top: '143.35px',
+                  fontSize: '21px',
+                  lineHeight: '40.57261276245117px',
+                  fontWeight: 400,
                   width: '646px',
-                  height: '40.57px'
+                  height: '40.57261276245117px'
                 }}
               >
-                <h2 className="font-normal text-[21px] leading-[1.2]">
-                  Hi, I'm Ananya, based out of New York City!
-                </h2>
-              </div>
+                Hi, I'm Ananya, based out of New York City!
+              </h2>
 
-              {/* Divider Line */}
+              {/* Divider Line - Exact Figma positioning */}
               <div
-                className="absolute bg-white"
                 style={{
-                  left: '63.47px',
-                  top: '221.35px',
-                  width: '500px',
-                  height: '1px'
+                  position: 'absolute',
+                  left: '7px',
+                  top: '78px',
+                  width: '632px',
+                  height: '1px',
+                  backgroundColor: 'white',
                 }}
               />
 
-              {/* Main Text */}
+              {/* Main Text - Exact Figma positioning */}
               <div
-                className="absolute text-center"
                 style={{
-                  left: '52.47px',
-                  top: '250.35px',
+                  position: 'absolute',
+                  left: '-4px',
+                  top: '107px',
                   width: '653px',
-                  height: '244px'
+                  height: '244px',
                 }}
               >
-                <h1 className="font-medium text-[35px] leading-[1.2] text-white">
+                <h1
+                  className="text-white font-medium leading-tight"
+                  style={{
+                    fontSize: '35px',
+                    lineHeight: '1.2',
+                    fontWeight: 500,
+                  }}
+                >
                   Design, for me, is<br />
-                  <span className="text-[#B7EA01]">where resilience meets<br />imagination.</span>
+                  <span style={{ color: '#B7EA01', fontWeight: 600 }}>
+                    where resilience meets<br />imagination.
+                  </span>
                 </h1>
               </div>
             </div>
@@ -266,12 +292,18 @@ export default function Index() {
               <div className="w-4 h-4 bg-[#9B9EA2] rounded-full"></div>
             </div>
             <div className="flex gap-4">
-              <button className="w-14 h-14 border border-[#B1B5B9] rounded-full flex items-center justify-center hover:border-white transition-colors">
+              <button 
+                className="w-14 h-14 border border-[#B1B5B9] rounded-full flex items-center justify-center hover:border-white transition-colors"
+                aria-label="Previous testimonial"
+              >
                 <svg width="32" height="16" viewBox="0 0 32 16" fill="none" className="w-6 h-3">
                   <path d="M1.25843 7.29289C0.867908 7.68342 0.867908 8.31658 1.25843 8.70711L7.62239 15.0711C8.01292 15.4616 8.64608 15.4616 9.03661 15.0711C9.42713 14.6805 9.42713 14.0474 9.03661 13.6569L3.37975 8L9.03661 2.34315C9.42713 1.95262 9.42713 1.31946 9.03661 0.928932C8.64608 0.538408 8.01292 0.538408 7.62239 0.928932L1.25843 7.29289ZM31.0344 8V7L1.96554 7V8V9L31.0344 9V8Z" fill="white"/>
                 </svg>
               </button>
-              <button className="w-14 h-14 border border-[#B1B5B9] rounded-full flex items-center justify-center hover:border-white transition-colors">
+              <button 
+                className="w-14 h-14 border border-[#B1B5B9] rounded-full flex items-center justify-center hover:border-white transition-colors"
+                aria-label="Next testimonial"
+              >
                 <svg width="31" height="16" viewBox="0 0 31 16" fill="none" className="w-6 h-3">
                   <path d="M29.776 7.29289C30.1665 7.68342 30.1665 8.31658 29.776 8.70711L23.412 15.0711C23.0215 15.4616 22.3883 15.4616 21.9978 15.0711C21.6073 14.6805 21.6073 14.0474 21.9978 13.6569L27.6547 8L21.9978 2.34315C21.6073 1.95262 21.6073 1.31946 21.9978 0.928932C22.3883 0.538408 23.0215 0.538408 23.412 0.928932L29.776 7.29289ZM0 8L0 7L29.0689 7V8V9L0 9L0 8Z" fill="white"/>
                 </svg>
