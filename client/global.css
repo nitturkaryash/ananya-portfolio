@@ -2,6 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Enhanced Typography */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom Section Spacing */
+@layer utilities {
+  .section-spacing {
+    @apply px-4 sm:px-6 lg:px-8;
+  }
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;
