@@ -73,7 +73,7 @@ const ContainerScroll = ({
     target: scrollRef,
   })
 
-  // Smart assembly progress with hysteresis
+  // Smart assembly progress with hysteresis - start immediately on scroll
   const assemblyProgress = useTransform(rawScrollYProgress, (progress) => {
     const prevProgress = previousProgress.current
     const isScrollingDown = progress > prevProgress
@@ -86,6 +86,7 @@ const ContainerScroll = ({
 
     // If scrolling down or assembly not completed, use normal progress
     if (isScrollingDown || !assemblyCompleted) {
+      // Start assembly immediately - use a more gradual curve for smooth animation
       const assemblyProg = Math.min(1, progress / 0.55)
 
       // Mark assembly as completed slightly early (at 54%) to ensure smooth transition
@@ -106,8 +107,8 @@ const ContainerScroll = ({
     return assemblyCompleted ? 1 : Math.min(1, progress / 0.55)
   })
 
-  // Smooth gated scroll progress - purely position-based
-  const gatedScrollYProgress = useTransform(rawScrollYProgress, [0, 0.55, 0.58, 1], [0, 0, 0, 1])
+  // Smooth gated scroll progress - allow gradual scrolling during assembly, full scroll after 100% assembly
+  const gatedScrollYProgress = useTransform(rawScrollYProgress, [0, 0.55, 0.7, 1], [0, 0.3, 0.8, 1])
 
 
   return (
@@ -134,7 +135,7 @@ const BentoGrid = React.forwardRef<
   const { rawScrollYProgress, assemblyProgress } = useContainerScrollContext()
 
   // Control positioning - purely position-based for smooth transitions
-  const position = useTransform(rawScrollYProgress, [0, 0.55], ["fixed", "sticky"])
+  const position = useTransform(rawScrollYProgress, [0.001, 0.55], ["fixed", "sticky"])
 
   // Add slight scale animation during assembly for visual appeal
   const gridScale = useTransform(assemblyProgress, [0, 1], [0.95, 1])
@@ -169,14 +170,13 @@ const BentoCell = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div"> & { in
 
     const startPos = initialPositions[index as keyof typeof initialPositions] || initialPositions[0]
 
-    // Assembly animation - direct interpolation from scroll progress
-    const assemblyRotate = useTransform(rawScrollYProgress, [0, 0.55], [startPos.rotate, 0])
+    // Assembly animation - start immediately on any scroll movement
+    const assemblyRotate = useTransform(rawScrollYProgress, [0.001, 0.55], [startPos.rotate, 0])
 
-    // Final transforms - purely position-based for smooth transitions
-    // Use direct interpolation from scroll progress to avoid state-based jumps
-    const finalX = useTransform(rawScrollYProgress, [0, 0.55], [startPos.x, 0])
-    const finalY = useTransform(rawScrollYProgress, [0, 0.55], [startPos.y, 0])
-    const finalScale = useTransform(rawScrollYProgress, [0, 0.55], [startPos.scale, 1])
+    // Final transforms - start immediately on any scroll movement for responsive assembly
+    const finalX = useTransform(rawScrollYProgress, [0.001, 0.55], [startPos.x, 0])
+    const finalY = useTransform(rawScrollYProgress, [0.001, 0.55], [startPos.y, 0])
+    const finalScale = useTransform(rawScrollYProgress, [0.001, 0.55], [startPos.scale, 1])
 
     return (
       <motion.div
@@ -210,7 +210,7 @@ const ContainerScale = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
     const finalY = useTransform(assemblyProgress, [0, 1], [0, -20])
 
     // Hide after assembly - purely position-based for smooth transitions
-    const finalDisplay = useTransform(rawScrollYProgress, [0, 0.55], ['block', 'none'])
+    const finalDisplay = useTransform(rawScrollYProgress, [0.001, 0.55], ['block', 'none'])
 
     return (
       <motion.div
