@@ -1,4 +1,5 @@
 import { ContainerScroll, BentoCell, ContainerScale, BentoGrid } from "@/components/blocks/scroll-animation";
+import { AnanyaCard } from "@/components/AnanyaCard";
 
 export default function Index() {
 
@@ -36,6 +37,12 @@ export default function Index() {
 
         {/* Right Side Icons */}
         <div className="flex items-center gap-4">
+          <a 
+            href="/ananya-card" 
+            className="text-[#B7EA01] text-sm font-medium hover:underline transition-colors"
+          >
+            View Card Demo
+          </a>
           <div className="hidden md:flex items-center gap-3">
             <svg width="25" height="25" viewBox="0 0 25 25" fill="none" className="w-6 h-6">
               <path d="M12.6618 0C13.1271 0.165212 13.2852 0.503146 13.2843 0.98418C13.2768 6.80248 13.2793 12.6212 13.2793 18.4395V18.7274C13.3631 18.6485 13.4182 18.6014 13.4682 18.5496C15.6915 16.2575 17.9147 13.9654 20.1359 11.6716C20.3069 11.4952 20.4924 11.365 20.7476 11.3621C21.0791 11.3579 21.328 11.5035 21.4706 11.7976C21.6124 12.0905 21.5753 12.378 21.3718 12.6375C21.3334 12.6863 21.2867 12.7288 21.2434 12.7739C18.8208 15.2788 16.3945 17.7799 13.9803 20.2931C13.6496 20.6373 13.3173 20.9477 12.8298 21.0216C12.2186 21.1142 11.6678 20.9836 11.2266 20.5272C10.3197 19.5889 9.4199 18.6439 8.51342 17.7052C6.9031 16.0372 5.28986 14.3718 3.6787 12.7046C3.33554 12.3496 3.32387 11.8694 3.64785 11.5544C3.9735 11.2378 4.45176 11.2582 4.79617 11.6128C7.03402 13.9195 9.27063 16.2279 11.5068 18.5367C11.5598 18.5914 11.6048 18.6527 11.6536 18.7111C11.6728 18.7053 11.6915 18.6994 11.7107 18.6936V18.4399C11.7107 12.6216 11.7132 6.8029 11.7057 0.984597C11.7049 0.503146 11.8633 0.165629 12.3287 0.000834404H12.6618V0Z" fill="#AA6829"/>
@@ -166,103 +173,7 @@ export default function Index() {
         </BentoGrid>
 
         <ContainerScale className="relative z-10 flex items-center justify-center px-4">
-          {/* Figma-Accurate Card Design */}
-          <div
-            className="relative overflow-hidden"
-            style={{
-              width: '759.4033203125px',
-              height: '593.6983032226562px',
-              maxWidth: '90vw',
-              maxHeight: '80vh',
-              borderRadius: '66px',
-            }}
-          >
-            {/* Morphism Background - Exact Figma Data */}
-            <div
-              className="absolute"
-              style={{
-                width: '593.135009765625px',
-                height: '759.4033203125px',
-                left: '9.43574333190918px',
-                top: '603.1339721679688px',
-                transform: 'matrix(0.0019049129914492369, -0.9999982118606567, 0.9999982118606567, 0.0019049129914492369, 0, 0)',
-                borderRadius: '66px',
-                backgroundImage: 'url("/images/morphism-exact.png")',
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                filter: 'exposure(-0.6) contrast(-0.233) saturation(-0.77) temperature(1) tint(-0.46) highlights(-0.38) shadows(-1)',
-                transformOrigin: 'center center',
-                opacity: 1,
-                mixBlendMode: 'normal',
-                backgroundRepeat: 'no-repeat'
-              }}
-            />
-
-
-            {/* Content Container - Exact Figma positioning */}
-            <div
-              className="relative z-10 flex flex-col"
-              style={{
-                position: 'absolute',
-                left: '56.46630859375px',
-                top: '143.353515625px',
-                width: '646px',
-                height: 'auto',
-              }}
-            >
-
-              {/* Header Text - Exact Figma positioning */}
-              <h2
-                className="text-white font-normal mb-8"
-                style={{
-                  fontSize: '21px',
-                  lineHeight: '40.57261276245117px',
-                  fontWeight: 400,
-                  width: '646px',
-                  height: '40.57261276245117px'
-                }}
-              >
-                Hi, I'm Ananya, based out of New York City!
-              </h2>
-
-              {/* Divider Line - Exact Figma positioning */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '7px',
-                  top: '78px',
-                  width: '632px',
-                  height: '1px',
-                  backgroundColor: 'white',
-                }}
-              />
-
-              {/* Main Text - Exact Figma positioning */}
-              <div
-                style={{
-                  position: 'absolute',
-                  left: '-4px',
-                  top: '107px',
-                  width: '653px',
-                  height: '244px',
-                }}
-              >
-                <h1
-                  className="text-white font-medium leading-tight"
-                  style={{
-                    fontSize: '35px',
-                    lineHeight: '1.2',
-                    fontWeight: 500,
-                  }}
-                >
-                  Design, for me, is<br />
-                  <span style={{ color: '#B7EA01', fontWeight: 600 }}>
-                    where resilience meets<br />imagination.
-                  </span>
-                </h1>
-              </div>
-            </div>
-          </div>
+          <AnanyaCard />
         </ContainerScale>
       </ContainerScroll>
 

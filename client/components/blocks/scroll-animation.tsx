@@ -46,6 +46,7 @@ const bentoGridVariants = cva(
 interface ContainerScrollContextValue {
   scrollYProgress: MotionValue<number>
   rawScrollYProgress: MotionValue<number>
+  assemblyProgress: MotionValue<number>
 }
 const ContainerScrollContext = React.createContext<
   ContainerScrollContextValue | undefined
@@ -65,26 +66,55 @@ const ContainerScroll = ({
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
   const scrollRef = React.useRef<HTMLDivElement>(null)
+  const [assemblyCompleted, setAssemblyCompleted] = React.useState(false)
+  const previousProgress = React.useRef(0)
 
   const { scrollYProgress: rawScrollYProgress } = useScroll({
     target: scrollRef,
   })
 
-  // Gated scroll progress that blocks page scroll until assembly completes
-  const gatedScrollYProgress = useTransform(rawScrollYProgress, (progress) => {
-    // During assembly phase (0-30%), return 0 to block all page scroll effects
-    if (progress < 0.3) {
-      return 0
+  // Smart assembly progress with hysteresis
+  const assemblyProgress = useTransform(rawScrollYProgress, (progress) => {
+    const prevProgress = previousProgress.current
+    const isScrollingDown = progress > prevProgress
+    previousProgress.current = progress
+
+    // If assembly is completed and we're not scrolling significantly up, stay assembled
+    if (assemblyCompleted && progress > 0.1) {
+      return 1 // Stay fully assembled
     }
-    // After assembly completes, map 30-100% to 0-100% for page scroll
-    return Math.min(1, (progress - 0.3) / 0.7)
+
+    // If scrolling down or assembly not completed, use normal progress
+    if (isScrollingDown || !assemblyCompleted) {
+      const assemblyProg = Math.min(1, progress / 0.55)
+
+      // Mark assembly as completed slightly early (at 54%) to ensure smooth transition
+      if (progress >= 0.54 && !assemblyCompleted) {
+        setAssemblyCompleted(true)
+      }
+
+      return assemblyProg
+    }
+
+    // If scrolling up significantly (< 10%), break assembly
+    if (progress < 0.1) {
+      setAssemblyCompleted(false)
+      return Math.min(1, progress / 0.55)
+    }
+
+    // Default: maintain current state
+    return assemblyCompleted ? 1 : Math.min(1, progress / 0.55)
   })
+
+  // Smooth gated scroll progress - purely position-based
+  const gatedScrollYProgress = useTransform(rawScrollYProgress, [0, 0.55, 0.58, 1], [0, 0, 0, 1])
 
 
   return (
     <ContainerScrollContext.Provider value={{
       scrollYProgress: gatedScrollYProgress,
-      rawScrollYProgress
+      rawScrollYProgress,
+      assemblyProgress
     }}>
       <div
         ref={scrollRef}
@@ -101,18 +131,13 @@ const BentoGrid = React.forwardRef<
   HTMLDivElement,
   React.HTMLAttributes<HTMLDivElement> & VariantProps<typeof bentoGridVariants>
 >(({ variant, className, ...props }, ref) => {
-  const { rawScrollYProgress } = useContainerScrollContext()
+  const { rawScrollYProgress, assemblyProgress } = useContainerScrollContext()
 
-  // Control positioning and ensure proper layering during assembly
-  const position = useTransform(rawScrollYProgress, (progress) => {
-    if (progress < 0.3) {
-      return "fixed" // Keep grid fixed during assembly
-    }
-    return "sticky" // Allow sticky behavior after assembly
-  })
+  // Control positioning - purely position-based for smooth transitions
+  const position = useTransform(rawScrollYProgress, [0, 0.55], ["fixed", "sticky"])
 
   // Add slight scale animation during assembly for visual appeal
-  const gridScale = useTransform(rawScrollYProgress, [0, 0.3], [0.95, 1])
+  const gridScale = useTransform(assemblyProgress, [0, 1], [0.95, 1])
 
   return (
     <motion.div
@@ -131,7 +156,7 @@ BentoGrid.displayName = "BentoGrid"
 
 const BentoCell = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div"> & { index?: number }>(
   ({ className, style, index = 0, ...props }, ref) => {
-    const { scrollYProgress, rawScrollYProgress } = useContainerScrollContext()
+    const { rawScrollYProgress } = useContainerScrollContext()
 
     // Define initial scattered positions for each card index - more dramatic spread
     const initialPositions = {
@@ -144,47 +169,14 @@ const BentoCell = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div"> & { in
 
     const startPos = initialPositions[index as keyof typeof initialPositions] || initialPositions[0]
 
-    // Assembly animation - cards move from scattered positions to center (0-30%)
-    // Using custom easing for smooth, simultaneous movement
-    const assemblyX = useTransform(rawScrollYProgress, [0, 0.3], [startPos.x, 0])
-    const assemblyY = useTransform(rawScrollYProgress, [0, 0.3], [startPos.y, 0])
-    const assemblyScale = useTransform(rawScrollYProgress, [0, 0.3], [startPos.scale, 1])
-    const assemblyRotate = useTransform(rawScrollYProgress, [0, 0.3], [startPos.rotate, 0])
+    // Assembly animation - direct interpolation from scroll progress
+    const assemblyRotate = useTransform(rawScrollYProgress, [0, 0.55], [startPos.rotate, 0])
 
-    // Page scroll animation - only happens AFTER assembly (uses gated progress)
-    const pageTranslate = useTransform(scrollYProgress, [0.1, 0.9], [0, -35])
-    const pageScale = useTransform(scrollYProgress, [0, 0.9], [1, 0.5])
-
-    // Final transforms - clean separation between assembly and page scroll
-    const finalX = useTransform(rawScrollYProgress, (progress) => {
-      if (progress <= 0.3) {
-        // Assembly phase: only assembly movement
-        return assemblyX.get()
-      } else {
-        // Page scroll phase: combine assembly end position + page scroll
-        return assemblyX.get() + pageTranslate.get()
-      }
-    })
-
-    const finalY = useTransform(rawScrollYProgress, (progress) => {
-      if (progress <= 0.3) {
-        // Assembly phase: only assembly movement
-        return assemblyY.get()
-      } else {
-        // Page scroll phase: stay at assembled position
-        return assemblyY.get()
-      }
-    })
-
-    const finalScale = useTransform(rawScrollYProgress, (progress) => {
-      if (progress <= 0.3) {
-        // Assembly phase: only assembly scaling
-        return assemblyScale.get()
-      } else {
-        // Page scroll phase: use page scroll scaling
-        return pageScale.get()
-      }
-    })
+    // Final transforms - purely position-based for smooth transitions
+    // Use direct interpolation from scroll progress to avoid state-based jumps
+    const finalX = useTransform(rawScrollYProgress, [0, 0.55], [startPos.x, 0])
+    const finalY = useTransform(rawScrollYProgress, [0, 0.55], [startPos.y, 0])
+    const finalScale = useTransform(rawScrollYProgress, [0, 0.55], [startPos.scale, 1])
 
     return (
       <motion.div
@@ -194,6 +186,7 @@ const BentoCell = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div"> & { in
           x: finalX,
           y: finalY,
           scale: finalScale,
+          rotate: assemblyRotate,
           ...style
         }}
         {...props}
@@ -205,21 +198,19 @@ BentoCell.displayName = "BentoCell"
 
 const ContainerScale = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   ({ className, style, ...props }, ref) => {
-    const { scrollYProgress, rawScrollYProgress } = useContainerScrollContext()
+    const { rawScrollYProgress, assemblyProgress } = useContainerScrollContext()
 
-    // Fade out during assembly phase (0-30%) simultaneously with card movement
-    const finalOpacity = useTransform(rawScrollYProgress, [0, 0.3], [1, 0])
+    // Fade out during assembly phase using assemblyProgress
+    const finalOpacity = useTransform(assemblyProgress, [0, 1], [1, 0])
 
     // Scale down slightly during assembly for a more elegant disappearance
-    const finalScale = useTransform(rawScrollYProgress, [0, 0.3], [1, 0.8])
+    const finalScale = useTransform(assemblyProgress, [0, 1], [1, 0.8])
 
     // Add slight upward movement during fade for polish
-    const finalY = useTransform(rawScrollYProgress, [0, 0.3], [0, -20])
+    const finalY = useTransform(assemblyProgress, [0, 1], [0, -20])
 
-    // Keep fixed position during assembly, then hide completely
-    const finalDisplay = useTransform(rawScrollYProgress, (progress) => {
-      return progress >= 0.3 ? 'none' : 'block'
-    })
+    // Hide after assembly - purely position-based for smooth transitions
+    const finalDisplay = useTransform(rawScrollYProgress, [0, 0.55], ['block', 'none'])
 
     return (
       <motion.div
