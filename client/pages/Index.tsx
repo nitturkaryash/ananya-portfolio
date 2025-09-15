@@ -55,7 +55,7 @@ export default function Index() {
       </div>
 
       {/* Main Content Grid */}
-      <ContainerScroll className="h-[350vh]">
+      <ContainerScroll className="h-[150vh]">
         <BentoGrid className="sticky left-0 top-0 z-0 h-screen w-full p-6 md:p-8">
           {/* Phrase Card */}
           <BentoCell index={0} className="relative bg-[#161616] rounded-3xl p-8 lg:p-16 flex flex-col justify-center overflow-hidden">
