@@ -8,8 +8,6 @@ import {
   motion,
   useScroll,
   useTransform,
-  useAnimation,
-  AnimationControls,
 } from "framer-motion"
 
 import { cn } from "@/lib/utils"
@@ -82,6 +80,7 @@ const ContainerScroll = ({
     return Math.min(1, (progress - 0.3) / 0.7)
   })
 
+
   return (
     <ContainerScrollContext.Provider value={{
       scrollYProgress: gatedScrollYProgress,
@@ -104,7 +103,7 @@ const BentoGrid = React.forwardRef<
 >(({ variant, className, ...props }, ref) => {
   const { rawScrollYProgress } = useContainerScrollContext()
 
-  // Control positioning based on assembly progress
+  // Control positioning and ensure proper layering during assembly
   const position = useTransform(rawScrollYProgress, (progress) => {
     if (progress < 0.3) {
       return "fixed" // Keep grid fixed during assembly
@@ -112,12 +111,17 @@ const BentoGrid = React.forwardRef<
     return "sticky" // Allow sticky behavior after assembly
   })
 
+  // Add slight scale animation during assembly for visual appeal
+  const gridScale = useTransform(rawScrollYProgress, [0, 0.3], [0.95, 1])
+
   return (
     <motion.div
       ref={ref}
       className={cn(bentoGridVariants({ variant }), className)}
       style={{
         position,
+        scale: gridScale,
+        zIndex: 10, // Ensure grid stays above background during assembly
       }}
       {...props}
     />
@@ -129,21 +133,23 @@ const BentoCell = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div"> & { in
   ({ className, style, index = 0, ...props }, ref) => {
     const { scrollYProgress, rawScrollYProgress } = useContainerScrollContext()
 
-    // Define initial scattered positions for each card index
+    // Define initial scattered positions for each card index - more dramatic spread
     const initialPositions = {
-      0: { x: -100, y: 50, scale: 0.8 }, // Phrase card (left)
-      1: { x: 150, y: -80, scale: 0.7 }, // Case Studies (top right)
-      2: { x: 120, y: 0, scale: 0.8 }, // About (middle right)
-      3: { x: 80, y: 120, scale: 0.75 }, // Resume/Let's Talk (right middle)
-      4: { x: 0, y: 150, scale: 0.85 } // Archives (bottom)
+      0: { x: -200, y: -100, scale: 0.6, rotate: -15 }, // Phrase card (top left)
+      1: { x: 300, y: -150, scale: 0.5, rotate: 10 }, // Case Studies (top right)
+      2: { x: 250, y: 50, scale: 0.6, rotate: -10 }, // About (middle right)
+      3: { x: 150, y: 200, scale: 0.55, rotate: 8 }, // Resume/Let's Talk (bottom right)
+      4: { x: -100, y: 250, scale: 0.65, rotate: -12 } // Archives (bottom left)
     }
 
     const startPos = initialPositions[index as keyof typeof initialPositions] || initialPositions[0]
 
     // Assembly animation - cards move from scattered positions to center (0-30%)
+    // Using custom easing for smooth, simultaneous movement
     const assemblyX = useTransform(rawScrollYProgress, [0, 0.3], [startPos.x, 0])
     const assemblyY = useTransform(rawScrollYProgress, [0, 0.3], [startPos.y, 0])
     const assemblyScale = useTransform(rawScrollYProgress, [0, 0.3], [startPos.scale, 1])
+    const assemblyRotate = useTransform(rawScrollYProgress, [0, 0.3], [startPos.rotate, 0])
 
     // Page scroll animation - only happens AFTER assembly (uses gated progress)
     const pageTranslate = useTransform(scrollYProgress, [0.1, 0.9], [0, -35])
@@ -201,31 +207,19 @@ const ContainerScale = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
   ({ className, style, ...props }, ref) => {
     const { scrollYProgress, rawScrollYProgress } = useContainerScrollContext()
 
-    // Start visible and stay visible during assembly phase (0-30%)
-    // Only fade out during page scroll phase (30%+)
-    const finalOpacity = useTransform(rawScrollYProgress, (progress) => {
-      if (progress <= 0.3) {
-        // During assembly phase - stay fully visible
-        return 1
-      }
-      // During page scroll phase - use gated scroll progress for fade out
-      const pageProgress = scrollYProgress.get()
-      return Math.max(0, 1 - (pageProgress * 2)) // Fade out faster
-    })
+    // Fade out during assembly phase (0-30%) simultaneously with card movement
+    const finalOpacity = useTransform(rawScrollYProgress, [0, 0.3], [1, 0])
 
-    const finalScale = useTransform(rawScrollYProgress, (progress) => {
-      if (progress <= 0.3) {
-        // During assembly phase - stay at full scale
-        return 1
-      }
-      // During page scroll phase - use gated scroll progress for scaling
-      const pageProgress = scrollYProgress.get()
-      return Math.max(0, 1 - (pageProgress * 2)) // Scale down faster
-    })
+    // Scale down slightly during assembly for a more elegant disappearance
+    const finalScale = useTransform(rawScrollYProgress, [0, 0.3], [1, 0.8])
 
-    const position = useTransform(scrollYProgress, (pos) =>
-      pos >= 0.6 ? "absolute" : "fixed"
-    )
+    // Add slight upward movement during fade for polish
+    const finalY = useTransform(rawScrollYProgress, [0, 0.3], [0, -20])
+
+    // Keep fixed position during assembly, then hide completely
+    const finalDisplay = useTransform(rawScrollYProgress, (progress) => {
+      return progress >= 0.3 ? 'none' : 'block'
+    })
 
     return (
       <motion.div
@@ -235,7 +229,9 @@ const ContainerScale = React.forwardRef<HTMLDivElement, HTMLMotionProps<"div">>(
           translate: "-50% -50%",
           opacity: finalOpacity,
           scale: finalScale,
-          position,
+          y: finalY,
+          position: "fixed",
+          display: finalDisplay,
           ...style,
         }}
         {...props}
